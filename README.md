@@ -80,7 +80,7 @@ flowchart TD
 ## Repository layout
 
 ```
-bifrost-prompt-optimizer/
+Bifrost-prompt-optimizer/
 ├── main.go                  # Bifrost adapter: Init, GetName, PreLLMHook, Cleanup
 ├── optimizer/
 │   ├── config.go            # Config + parsing of config.json
@@ -106,7 +106,7 @@ bifrost-prompt-optimizer/
 You only need [Go](https://go.dev/dl/) 1.22 or newer. This runs every unit test, including the optimizer, stats and dashboard server:
 
 ```bash
-git clone https://github.com/yourusername/bifrost-prompt-optimizer.git
+git clone https://github.com/kritik-701/Bifrost-prompt-optimizer.git
 cd bifrost-prompt-optimizer
 make test
 ```
@@ -145,8 +145,8 @@ Note both numbers. You will use them in the next step.
 
 ```bash
 cd ..                                   # back out of the bifrost folder
-git clone https://github.com/yourusername/bifrost-prompt-optimizer.git
-cd bifrost-prompt-optimizer
+git clone https://github.com/kritik-701/Bifrost-prompt-optimizer.git
+cd Bifrost-prompt-optimizer
 
 make deps CORE_VERSION=v1.14.1          # use the core version from step 2
 make build                              # writes build/prompt-optimizer.so
@@ -164,7 +164,7 @@ Open your Bifrost `config.json`, keep your existing provider settings (see Bifro
     {
       "enabled": true,
       "name": "prompt-optimizer",
-      "path": "/home/you/bifrost-prompt-optimizer/build/prompt-optimizer.so",
+      "path": "/home/you/Bifrost-prompt-optimizer/build/prompt-optimizer.so",
       "config": { "stats_addr": "127.0.0.1:9091" }
     }
   ]
@@ -292,9 +292,9 @@ Replace the placeholder module path everywhere:
 
 ```bash
 # Linux
-grep -rl yourusername . | xargs sed -i 's#yourusername#YOUR_GITHUB_HANDLE#g'
+grep -rl yourusername . | xargs sed -i 's#yourusername#kritik-701#g'
 # macOS
-grep -rl yourusername . | xargs sed -i '' 's#yourusername#YOUR_GITHUB_HANDLE#g'
+grep -rl yourusername . | xargs sed -i '' 's#yourusername#kritik-701#g'
 ```
 
 ## Mapping to the hackathon requirements
