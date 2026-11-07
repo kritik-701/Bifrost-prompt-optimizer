@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prompt Optimizer for Bifrost</title>
+  <!-- Tailwind Play CDN: needs internet access in the browser. Fine for a local dashboard. -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
+  <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+
+    <header class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight">Prompt Optimizer</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400">Live metrics from the Bifrost gateway plugin · uptime <span id="uptime">–</span></p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span id="status" class="inline-flex items-center gap-2 rounded-full border border-slate-300 px-3 py-1 text-xs font-medium dark:border-slate-700">
+          <span id="status-dot" class="h-2 w-2 rounded-full bg-slate-400"></span>
+          <span id="status-text">Connecting</span>
+        </span>
+        <button id="pause" type="button"
+          class="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800">
+          Pause
+        </button>
+      </div>
+    </header>
+
+    <!-- Headline metrics -->
+    <section class="mt-6 grid gap-4 md:grid-cols-3" aria-label="Headline metrics">
+      <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <h2 class="text-sm font-medium text-slate-500 dark:text-slate-400">Tokens Saved</h2>
+        <p id="tokens-saved" class="mt-2 text-4xl font-semibold tabular-nums">0</p>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><span id="reduction">0.0%</span> smaller prompts (estimated)</p>
+      </article>
+
+      <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <h2 class="text-sm font-medium text-slate-500 dark:text-slate-400">Cost Reduced</h2>
+        <p id="cost-saved" class="mt-2 text-4xl font-semibold tabular-nums">$0.00</p>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Input side, at <span id="price">$0.00</span> per 1M tokens</p>
+      </article>
+
+      <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <h2 class="text-sm font-medium text-slate-500 dark:text-slate-400">Latency Overhead</h2>
+        <p class="mt-2 text-4xl font-semibold tabular-nums"><span id="lat-avg">0.00</span><span class="ml-1 text-xl font-normal text-slate-500">ms avg</span></p>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">p95 <span id="lat-p95">0.00</span> ms · max <span id="lat-max">0.00</span> ms</p>
+      </article>
+    </section>
+
+    <!-- Detail row -->
+    <section class="mt-4 grid gap-4 lg:grid-cols-3">
+      <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 lg:col-span-2">
+        <h2 class="text-sm font-medium text-slate-500 dark:text-slate-400">Tokens before vs after</h2>
+        <div class="mt-4 space-y-3">
+          <div>
+            <div class="mb-1 flex justify-between text-xs text-slate-500 dark:text-slate-400"><span>Before</span><span id="tok-before" class="tabular-nums">0</span></div>
+            <div class="h-3 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"><div id="bar-before" class="h-full rounded-full bg-slate-400" style="width:0%"></div></div>
+          </div>
+          <div>
+            <div class="mb-1 flex justify-between text-xs text-slate-500 dark:text-slate-400"><span>After</span><span id="tok-after" class="tabular-nums">0</span></div>
+            <div class="h-3 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"><div id="bar-after" class="h-full rounded-full bg-emerald-500" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <div class="mt-6 grid gap-6 sm:grid-cols-2">
+          <div>
+            <h3 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Tokens saved per request</h3>
+            <svg id="spark-saved" viewBox="0 0 300 60" preserveAspectRatio="none" class="mt-2 h-16 w-full text-emerald-500" role="img" aria-label="Tokens saved per request, last requests"></svg>
+          </div>
+          <div>
+            <h3 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Plugin latency per request (ms)</h3>
+            <svg id="spark-latency" viewBox="0 0 300 60" preserveAspectRatio="none" class="mt-2 h-16 w-full text-indigo-500" role="img" aria-label="Plugin latency per request, last requests"></svg>
+          </div>
+        </div>
+      </article>
+
+      <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <h2 class="text-sm font-medium text-slate-500 dark:text-slate-400">Requests</h2>
+        <dl class="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div><dt class="text-xs text-slate-500 dark:text-slate-400">Processed</dt><dd id="req-processed" class="text-2xl font-semibold tabular-nums">0</dd></div>
+          <div><dt class="text-xs text-slate-500 dark:text-slate-400">Modified</dt><dd id="req-modified" class="text-2xl font-semibold tabular-nums">0</dd></div>
+          <div><dt class="text-xs text-slate-500 dark:text-slate-400">Errors</dt><dd id="req-errors" class="text-2xl font-semibold tabular-nums">0</dd></div>
+        </dl>
+
+        <h2 class="mt-6 text-sm font-medium text-slate-500 dark:text-slate-400">Sanitized items <span id="redact-total" class="tabular-nums">(0)</span></h2>
+        <ul id="redactions" class="mt-2 space-y-1 text-sm"></ul>
+      </article>
+    </section>
+
+    <!-- Live feed -->
+    <section class="mt-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <h2 class="text-sm font-medium text-slate-500 dark:text-slate-400">Latest requests</h2>
+      <div class="mt-3 overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            <tr><th class="py-2 pr-4 font-medium">Time</th><th class="py-2 pr-4 font-medium">Tokens saved</th><th class="py-2 pr-4 font-medium">Sanitized</th><th class="py-2 font-medium">Latency</th></tr>
+          </thead>
+          <tbody id="feed" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+        </table>
+      </div>
+      <p id="feed-empty" class="py-6 text-center text-sm text-slate-500 dark:text-slate-400">No requests yet. Send a chat completion through Bifrost and it will appear here.</p>
+    </section>
+
+    <p class="mt-6 text-xs text-slate-500 dark:text-slate-400">
+      Token counts are estimates (about 4 characters per token), not the provider's exact tokenizer.
+      Cost uses the price configured as <code>cost_per_million_input_usd</code> and covers input tokens only.
+    </p>
+  </main>
+
+<script>
+(() => {
+  'use strict';
+  const POLL_MS = 2000;
+  const $ = (id) => document.getElementById(id);
+  const num = new Intl.NumberFormat();
+  let paused = false;
+  let timer = null;
+
+  const fmtMs = (v) => (v < 10 ? v.toFixed(3) : v.toFixed(1));
+  const fmtUsd = (v) => (Math.abs(v) >= 1 ? '$' + v.toFixed(2) : '$' + v.toFixed(4));
+  const fmtPct = (v) => v.toFixed(1) + '%';
+
+  function fmtUptime(s) {
+    s = Math.floor(s);
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;
+    return h > 0 ? `${h}h ${m}m` : m > 0 ? `${m}m ${r}s` : `${r}s`;
+  }
+
+  function setStatus(state, text) {
+    const colors = { live: 'bg-emerald-500', paused: 'bg-amber-500', down: 'bg-red-500' };
+    const dot = $('status-dot');
+    dot.className = 'h-2 w-2 rounded-full ' + (colors[state] || 'bg-slate-400');
+    $('status-text').textContent = text;
+  }
+
+  function sparkline(svg, values) {
+    svg.replaceChildren();
+    if (values.length < 2) return;
+    const w = 300, h = 60, pad = 4;
+    const min = Math.min(0, ...values);
+    const max = Math.max(1e-9, ...values);
+    const span = max - min || 1;
+    const pts = values.map((v, i) => {
+      const x = pad + (i * (w - 2 * pad)) / (values.length - 1);
+      const y = h - pad - ((v - min) / span) * (h - 2 * pad);
+      return x.toFixed(1) + ',' + y.toFixed(1);
+    }).join(' ');
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+    line.setAttribute('points', pts);
+    line.setAttribute('fill', 'none');
+    line.setAttribute('stroke', 'currentColor');
+    line.setAttribute('stroke-width', '2');
+    line.setAttribute('stroke-linejoin', 'round');
+    line.setAttribute('vector-effect', 'non-scaling-stroke');
+    svg.appendChild(line);
+  }
+
+  function cell(text, extra) {
+    const td = document.createElement('td');
+    td.className = 'py-2 pr-4 tabular-nums ' + (extra || '');
+    td.textContent = text;
+    return td;
+  }
+
+  function render(s) {
+    $('uptime').textContent = fmtUptime(s.uptime_seconds);
+
+    $('tokens-saved').textContent = num.format(s.tokens_saved);
+    $('reduction').textContent = fmtPct(s.reduction_percent);
+    $('cost-saved').textContent = fmtUsd(s.cost_saved_usd);
+    $('price').textContent = '$' + s.cost_per_million_input_usd.toFixed(2);
+    $('lat-avg').textContent = fmtMs(s.latency.avg_ms);
+    $('lat-p95').textContent = fmtMs(s.latency.p95_ms);
+    $('lat-max').textContent = fmtMs(s.latency.max_ms);
+
+    $('tok-before').textContent = num.format(s.tokens_before);
+    $('tok-after').textContent = num.format(s.tokens_after);
+    const top = Math.max(s.tokens_before, s.tokens_after, 1);
+    $('bar-before').style.width = (s.tokens_before / top * 100).toFixed(1) + '%';
+    $('bar-after').style.width = (Math.max(s.tokens_after, 0) / top * 100).toFixed(1) + '%';
+
+    $('req-processed').textContent = num.format(s.requests_processed);
+    $('req-modified').textContent = num.format(s.requests_modified);
+    $('req-errors').textContent = num.format(s.errors);
+
+    $('redact-total').textContent = '(' + num.format(s.redactions_total) + ')';
+    const list = $('redactions');
+    list.replaceChildren();
+    const kinds = Object.entries(s.redactions).sort((a, b) => b[1] - a[1]);
+    if (kinds.length === 0) {
+      const li = document.createElement('li');
+      li.className = 'text-slate-500 dark:text-slate-400';
+      li.textContent = 'Nothing sanitized yet';
+      list.appendChild(li);
+    }
+    for (const [kind, count] of kinds) {
+      const li = document.createElement('li');
+      li.className = 'flex justify-between';
+      const name = document.createElement('span');
+      name.textContent = kind.replace(/_/g, ' ');
+      const n = document.createElement('span');
+      n.className = 'tabular-nums text-slate-500 dark:text-slate-400';
+      n.textContent = num.format(count);
+      li.append(name, n);
+      list.appendChild(li);
+    }
+
+    const recent = s.recent || [];
+    const chronological = recent.slice().reverse();
+    sparkline($('spark-saved'), chronological.map((r) => r.tokens_saved));
+    sparkline($('spark-latency'), chronological.map((r) => r.latency_ms));
+
+    const feed = $('feed');
+    feed.replaceChildren();
+    $('feed-empty').hidden = recent.length > 0;
+    for (const r of recent) {
+      const tr = document.createElement('tr');
+      tr.append(
+        cell(new Date(r.unix_ms).toLocaleTimeString()),
+        cell(num.format(r.tokens_saved)),
+        cell(num.format(r.redactions)),
+        cell(fmtMs(r.latency_ms) + ' ms')
+      );
+      feed.appendChild(tr);
+    }
+  }
+
+  async function refresh() {
+    if (paused) return;
+    try {
+      const res = await fetch('/api/stats', { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      render(await res.json());
+      setStatus('live', 'Live');
+    } catch (err) {
+      setStatus('down', 'Disconnected');
+    }
+  }
+
+  $('pause').addEventListener('click', () => {
+    paused = !paused;
+    $('pause').textContent = paused ? 'Resume' : 'Pause';
+    if (paused) { setStatus('paused', 'Paused'); } else { refresh(); }
+  });
+
+  refresh();
+  timer = setInterval(refresh, POLL_MS);
+  window.addEventListener('beforeunload', () => clearInterval(timer));
+})();
+</script>
+</body>
+</html>
