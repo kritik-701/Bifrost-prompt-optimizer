@@ -1,3 +1,3 @@
-module github.com/kritik-701/bifrost-prompt-optimizer
+module github.com/kritik-701/Bifrost-prompt-optimizer
 
 go 1.22
