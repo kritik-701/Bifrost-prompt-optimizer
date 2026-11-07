@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/kritik-701/bifrost-prompt-optimizer/stats"
+	"github.com/kritik-701/Bifrost-prompt-optimizer/stats"
 )
 
 //go:embed index.html
