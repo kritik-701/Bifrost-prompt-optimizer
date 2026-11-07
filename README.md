@@ -297,6 +297,12 @@ Bifrost's [plugin guide](https://www.getmaxim.ai/docs/bifrost/contributing/plugi
 | Reproducible integration | Step-by-step setup above, `config.example.json`, `scripts/smoke.sh` |
 | Contribution quality | Unit and fuzz tests, CI workflow, documented limitations, upstream checklist |
 
+## Acknowledgements and AI assistance
+
+- Initial code, tests, dashboard and documentation were drafted with Claude (Anthropic's AI assistant), then edited and set up by us.
+- Built on the [Bifrost](https://github.com/maximhq/bifrost) open-source gateway by Maxim AI, using its documented plugin interface. References: the Bifrost plugin docs at docs.getbifrost.ai.
+- Dashboard styling uses the Tailwind CSS CDN.
+
 ## License
 
 Licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
