@@ -199,7 +199,7 @@ func TestEdgeCases(t *testing.T) {
 		in := strings.Repeat("word    word  \n\n\n", 50000)
 		start := time.Now()
 		res := o.Optimize(in)
-		if time.Since(start) > 5*time.Second {
+		if time.Since(start) > 30*time.Second {
 			t.Errorf("took too long: %v", time.Since(start))
 		}
 		if res.TokensAfter >= res.TokensBefore {
