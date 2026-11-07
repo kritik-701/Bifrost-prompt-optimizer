@@ -1,0 +1,5 @@
+build/
+*.so
+bifrost-http
+tmp/
+.DS_Store

@@ -1,0 +1,30 @@
+{
+  "plugins": [
+    {
+      "enabled": true,
+      "name": "prompt-optimizer",
+      "path": "/absolute/path/to/bifrost-prompt-optimizer/build/prompt-optimizer.so",
+      "config": {
+        "enabled": true,
+        "roles": ["system", "user"],
+
+        "collapse_whitespace": true,
+        "max_blank_lines": 1,
+        "dedupe_lines": true,
+        "compress_phrases": true,
+        "strip_invisible": true,
+
+        "redact_emails": true,
+        "redact_phones": true,
+        "redact_credit_cards": true,
+        "redact_ssn": true,
+        "redact_aadhaar": true,
+        "redact_secrets": true,
+
+        "stats_enabled": true,
+        "stats_addr": "127.0.0.1:9091",
+        "cost_per_million_input_usd": 2.5
+      }
+    }
+  ]
+}
