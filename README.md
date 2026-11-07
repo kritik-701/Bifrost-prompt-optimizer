@@ -284,18 +284,9 @@ What the tests cover:
 Bifrost's [plugin guide](https://www.getmaxim.ai/docs/bifrost/contributing/plugin) expects each plugin in its own folder with `main.go`, `plugin_test.go`, `README.md` and `go.mod`. Before opening a PR:
 
 1. Open an issue on the Bifrost repository describing the feature and ask where maintainers want it (`plugins/prompt-optimizer/` is the likely home).
-2. Replace `yourusername` in `go.mod` and the imports with the final module path (see below).
-3. Add Bifrost's `LICENSE` (Apache-2.0) and match the repository's contribution and commit conventions.
-4. Run `make fmt vet test` and keep CI green.
+2. Keep the Apache-2.0 `LICENSE` and match Bifrost's contribution and commit conventions.
+3. Run `make fmt vet test` and keep CI green.
 
-Replace the placeholder module path everywhere:
-
-```bash
-# Linux
-grep -rl yourusername . | xargs sed -i 's#yourusername#kritik-701#g'
-# macOS
-grep -rl yourusername . | xargs sed -i '' 's#yourusername#kritik-701#g'
-```
 
 ## Mapping to the hackathon requirements
 
@@ -308,4 +299,4 @@ grep -rl yourusername . | xargs sed -i '' 's#yourusername#kritik-701#g'
 
 ## License
 
-Add the Apache-2.0 `LICENSE` file from the Bifrost repository before publishing.
+Licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
