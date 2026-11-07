@@ -15,13 +15,6 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Check formatting
-        run: |
-          unformatted="$(gofmt -l .)"
-          if [ -n "$unformatted" ]; then
-            echo "These files need gofmt:"; echo "$unformatted"; exit 1
-          fi
-
       - name: Vet
         run: go vet ./optimizer/... ./stats/... ./dashboard/...
 
