@@ -24,9 +24,9 @@ import (
 
 	"github.com/maximhq/bifrost/core/schemas"
 
-	"github.com/kritik-701/bifrost-prompt-optimizer/dashboard"
-	"github.com/kritik-701/bifrost-prompt-optimizer/optimizer"
-	"github.com/kritik-701/bifrost-prompt-optimizer/stats"
+	"github.com/kritik-701/Bifrost-prompt-optimizer/dashboard"
+	"github.com/kritik-701/Bifrost-prompt-optimizer/optimizer"
+	"github.com/kritik-701/Bifrost-prompt-optimizer/stats"
 )
 
 const (
