@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yourusername/bifrost-prompt-optimizer/stats"
+	"github.com/kritik-701/bifrost-prompt-optimizer/stats"
 )
 
 func TestStatsEndpointReturnsJSON(t *testing.T) {
